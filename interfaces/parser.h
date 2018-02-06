@@ -44,7 +44,7 @@ DataType determine_dataType(char* buffer);
 /* parse bytes to Pha_t list or array.
  * return 0 for parse well, -1 otherwise
  */
-int parse_spat(void *bytes, size_t no_bytes, Pha_t *phaList, const int len);
+int parse_spat(char *bytes, size_t no_bytes, Pha_t *phaList, const int len);
 
 /* parse bytes to BSM ... todo
  */

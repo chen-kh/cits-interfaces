@@ -5,9 +5,9 @@ DataType determine_dataType(char* buffer){
 	return T_SPAT;
 }
 
-int parse_spat(void *bytes, size_t no_bytes, Pha_t *phaList, const int len){
+int parse_spat(char *bytes, size_t no_bytes, Pha_t *phaList, const int len){
 	int i;
-	for(i=0; i<len_pha; i++){
+	for(i=0; i<len; i++){
 		PhaseID id = get_phaseId_by_no(i);
 		// judge if id is PhaseIdError
 		Light light = get_light_by_byte(bytes[5+5*i]);
