@@ -1,5 +1,7 @@
-#include <LightState.h>
+#ifndef _PARSER_
+#define _PARSER_
 
+#include <LightState.h>
 
 typedef enum phaseid{
 	V_East = 0,
@@ -11,23 +13,22 @@ typedef enum phaseid{
 	P_West = 6,
 	P_North = 7,
 	PhaseIdError = -1
-}PhaseID;
-
+} PhaseID;
 
 typedef enum lightid{
 	Dark = LightState_dark,
 	Red = LightState_stop_And_Remain,
 	Green = LightState_permissive_Movement_Allowed,
 	Yellow = LightState_intersection_clearance
-}Light;
-
+} Light;
 
 // enum of data type
 typedef enum type{
 	T_ERROR = -1,
-	T_SPAT = 0
+	T_SPAT = 0,
+	T_BSM = 1,
+	T_RSM = 2
 } DataType;
-
 
 typedef struct pha{
 	PhaseID id; // 0-7
@@ -48,9 +49,9 @@ int parse_spat(char *bytes, size_t no_bytes, Pha_t *phaList, const int len);
 
 /* parse bytes to BSM ... todo
  */
-int parse_bsm(void *bytes, size_t no_bytes, void todo);
-int parse_rsm(void *bytes, size_t no_bytes, void todo);
-int parse_map(void *bytes, size_t no_bytes, void todo);
+int parse_bsm(void *bytes, size_t no_bytes, void* todo);
+int parse_rsm(void *bytes, size_t no_bytes, void* todo);
+int parse_map(void *bytes, size_t no_bytes, void* todo);
 
 
 /***********************************
@@ -63,4 +64,6 @@ Light get_light_by_byte(char byte);
 
 long get_likelyEndTime_by_bytes(char byte1,char byte2);
 
-int checkd_checksum_by_bytes(char byte1,char byte2,char byte3,char byte4);
+int check_checksum_by_bytes(char byte1,char byte2,char byte3,char byte4);
+
+#endif

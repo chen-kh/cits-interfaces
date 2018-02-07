@@ -3,6 +3,9 @@
 # Prerequisites
 *.d
 
+# igonre executable files
+*.exe
+
 # Object files
 *.o
 *.ko

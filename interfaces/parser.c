@@ -1,5 +1,5 @@
 #include "parser.h"
-
+#include "for_debug.h"
 
 DataType determine_dataType(char* buffer){
 	return T_SPAT;
@@ -71,11 +71,10 @@ long get_likelyEndTime_by_bytes(char byte1, char byte2){
 	return time;
 }
 
-int checkd_checksum_by_bytes(char byte1,char byte2,char byte3,char byte4){	
+int check_checksum_by_bytes(char byte1,char byte2,char byte3,char byte4){	
 	char checkend=0x7f&(byte2^byte3^byte4);
-	printf("checkend=%d",checkend);
 	if(byte1 != checkend){
-		printf("校验错误\n");
+		CITS_DEBUG("checksum FAIL!");
 		return -1;
 	}
 	else

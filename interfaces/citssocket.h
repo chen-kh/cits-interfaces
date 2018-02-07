@@ -1,15 +1,10 @@
-#include <sys/types.h>  
-#include <netinet/in.h>  
-#include <netdb.h>  
-#include <sys/socket.h>  
-#include <sys/wait.h>  
-#include <arpa/inet.h>
-
+#ifndef	_CITSSOCKET_H_
+#define	_CITSSOCKET_H_
 
 /* function for receiving socket to buffer pre-allocated with para len specified
  * return 0 for receive well, -1 if failed.
  */
-int revc_socket(char* buffer, const int len);
+int recv_socket(char* buffer, const int len);
 
 /* check if data is damaged
  */
@@ -20,7 +15,13 @@ int check_valid(char* bytes);
  */
 int recv_spat(char* buffer, size_t no_bytes);
 
-
-/* test function for broadccasting spat data
+/* to do
  */
+int udp_broadcast_spat(char* buffer, const int len);
+
+/***********************************
+ *       functions for test        *
+ ***********************************/
 int udp_broadcast();
+
+#endif

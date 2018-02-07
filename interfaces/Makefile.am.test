@@ -1,0 +1,47 @@
+ASN_MODULE_SOURCES=	\
+	encode_decode.c \
+	citssocket.c \
+	creator.c \
+	parser.c \
+
+
+ASN_MODULE_HEADERS=	\
+	encode_decode.h \
+	citssocket.h \
+	creator.h \
+	parser.h \
+
+ASN_TEST_SOURCES+=test-sample.c
+
+
+lib_LTLIBRARIES=libsomething.la
+libsomething_la_SOURCES=$(ASN_MODULE_SOURCES) $(ASN_MODULE_HEADERS)
+
+# This file may be used as an input for make(3)
+# Remove the lines below to convert it into a pure .am file
+TARGET = test-sample.exe
+CFLAGS += -I../TCSAE
+CFLAGS += -DEMIT_CITS_DEBUG
+
+OBJS=${ASN_MODULE_SOURCES:.c=.o} ${ASN_TEST_SOURCES:.c=.o}
+
+all: $(TARGET)
+
+$(TARGET): ${OBJS}
+	$(CC) $(CFLAGS) -o $(TARGET) ../TCSAE/*.o ${OBJS} $(LDFLAGS) $(LIBS)
+
+.SUFFIXES:
+.SUFFIXES: .c .o
+
+.c.o:
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+clean:
+	rm -f $(TARGET)
+	rm -f $(OBJS)
+
+regen: regenerate-from-asn1-source
+
+regenerate-from-asn1-source:
+	asn1c BSM.asn DefAcceleration.asn DefMotion.asn DefPosition.asn DefPositionOffset.asn DefTime.asn Map.asn MapLane.asn MapLink.asn MapNode.asn MapPoint.asn MapSpeedLimit.asn MsgFrame.asn RSI.asn RSM.asn SignalPhaseAndTiming.asn SPATIntersectionState.asn VehBrake.asn VehClass.asn VehSafetyExt.asn VehSize.asn VehStatus.asn
+
