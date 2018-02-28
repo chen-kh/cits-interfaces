@@ -24,10 +24,12 @@ typedef enum lightid{
 
 // enum of data type
 typedef enum type{
-	T_ERROR = -1,
-	T_SPAT = 0,
-	T_BSM = 1,
-	T_RSM = 2
+	T_ERROR = 0xFF,
+	T_SPAT = 0x00,
+	T_BSM = 0x01,
+	T_RSM = 0x02,
+	T_RSI = 0x03,
+	T_MAP = 0x04
 } DataType;
 
 typedef struct pha{

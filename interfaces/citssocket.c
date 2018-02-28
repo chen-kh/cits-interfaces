@@ -30,7 +30,7 @@ int recv_socket(char *buffer,const int len_buf){
         return -1;  
     }
     int recvbytes;
-    int addrLen = sizeof(struct sockaddr_in); 
+    int addrLen = sizeof(struct sockaddr_in);
     recvbytes = recvfrom(sockListen, buffer, len_buf, 0, (struct sockaddr *)&recvAddr, &addrLen);
     if(recvbytes!= -1){  
         CITS_DEBUG("receive a broadCast messgse:%s\n",buffer);  

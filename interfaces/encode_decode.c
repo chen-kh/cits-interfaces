@@ -1,14 +1,9 @@
 #include "encode_decode.h"
 #include "for_debug.h"
 
-/* Problem remains:
- * 1. how to determine buffer size allocated?
- * 	  if the init_buffer_size is not large enough, it causes problem while decoding.
- * 2. how to determine buffer_size?
- * 	  if the buffer_size is not large enough, the encode result return -1
+/* 
  */
-int encode_spat(SPAT_t *spat, EncodedSPAT_t *encoded_spat){
-	size_t buffer_size = 1024; // ???
+int encode_spat(SPAT_t *spat, EncodedSPAT_t *encoded_spat, size_t buffer_size){
 	asn_enc_rval_t arv = der_encode_to_buffer(&asn_DEF_SPAT, spat, encoded_spat->buffer, buffer_size);
 	encoded_spat->no_bytes_encoded = arv.encoded;
 	if(arv.encoded > 0){
@@ -22,13 +17,10 @@ int encode_spat(SPAT_t *spat, EncodedSPAT_t *encoded_spat){
 
 int encode_spat_to_new_buffer(SPAT_t *spat, EncodedSPAT_t *encoded_spat){
 	size_t init_buffer_size = sizeof(SPAT_t);
-	encoded_spat->buffer = calloc(1, init_buffer_size);
-	size_t buffer_size = 10 * init_buffer_size; // ???
+	ssize_t size_encoding = determine_encoding_size(&asn_DEF_SPAT, spat);
+	encoded_spat->buffer = calloc(1, size_encoding);
+	size_t buffer_size = size_encoding; // ???
 	asn_enc_rval_t arv = der_encode_to_buffer(&asn_DEF_SPAT, spat, encoded_spat->buffer, buffer_size);
-	if(arv.encoded > init_buffer_size){
-		encoded_spat->buffer = calloc(1, arv.encoded);
-		arv = der_encode_to_buffer(&asn_DEF_SPAT, spat, encoded_spat->buffer, buffer_size);
-	}
 	encoded_spat->no_bytes_encoded = arv.encoded;
 	if(arv.encoded > 0){
 		CITS_DEBUG("SPAT encode may SUCCESS, number of encoded bytes = %ld", arv.encoded);
@@ -52,4 +44,12 @@ int decode_spat(EncodedSPAT_t *encoded_spat, void *spat){
     	CITS_DEBUG("Decode SPAT SUCCESS!");
   		return 0;
   	}
+}
+ssize_t determine_encoding_size(struct asn_TYPE_descriptor_s *type_descriptor, void *struct_ptr/* Structure to be encoded */){
+	asn_enc_rval_t arv = der_encode(type_descriptor, struct_ptr, pass_write_out_f, stdout);
+	return arv.encoded;
+}
+/* function used to dertermin the size of the structure's encodeing before actually doing the encoding*/
+static int pass_write_out_f(const void *buffer, size_t size, void *key) {
+	return 0;
 }

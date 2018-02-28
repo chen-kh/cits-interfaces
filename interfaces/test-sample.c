@@ -6,34 +6,36 @@
 #include "creator.h"
 #include "encode_decode.h"
 
-void test_spat(void* bytes, size_t no_bytes, Pha_t* phaList, const int len);
+void test_spat(void* bytes, size_t no_bytes, const int len);
 
 
 int main(){
 	void* bytes;
 	size_t no_bytes = 45;
 	const int len = 8;
-	Pha_t *phaList;
-	bytes = calloc(no_bytes, 1);
 	
 	do{
+		bytes = calloc(no_bytes, 1);
 		recv_socket(bytes, no_bytes);
 		DataType type = determine_dataType(bytes);
 
 		switch(type){
 			case T_SPAT:
-				phaList = (Pha_t*)calloc(8, sizeof(Pha_t));
-				test_spat(bytes, no_bytes, phaList, len);
+				test_spat(bytes, no_bytes, len);
+				free(bytes);
+				bytes=NULL;
 				break;
 			default:
 				return -1;
 		}
-	}while(0);
+	}while(1);
 	
 	return 0;
 }
 
-void test_spat(void* bytes, size_t no_bytes, Pha_t* phaList, const int len){
+void test_spat(void* bytes, size_t no_bytes, const int len){
+	Pha_t *phaList;
+	phaList = (Pha_t*)calloc(8, sizeof(Pha_t));
 	int ret;
 	parse_spat(bytes, no_bytes, phaList, len);
 	int n;
@@ -41,7 +43,11 @@ void test_spat(void* bytes, size_t no_bytes, Pha_t* phaList, const int len){
 		printf("PhaseId = %d, Light = %d, LikelyEndTime = %ld\n", phaList[n].id, phaList[n].light, phaList[n].likelyEndTime);
 	}
 	SPAT_t *spat = (SPAT_t*)calloc(1, sizeof(SPAT_t));
-	create_spat_from_PhaList(phaList, len, spat);
+	ret = create_spat_from_PhaList(phaList, len, spat);
+	assert(ret==0);
+	free(phaList);
+	phaList=NULL;
+
 	ret = check_constraints_spat(spat);
 	assert(ret==0);
 	
@@ -53,12 +59,16 @@ void test_spat(void* bytes, size_t no_bytes, Pha_t* phaList, const int len){
 	encode_spat_to_new_buffer(spat, &encoded_spat);
 	SPAT_t *de_spat = (SPAT_t*)calloc(1, sizeof(SPAT_t));
 	decode_spat(&encoded_spat, de_spat);
-
+	free(encoded_spat.buffer);
+	
 	// test encode
 	EncodedSPAT_t encoded_spat2;
-	encoded_spat2.buffer = calloc(5, sizeof(SPAT_t));
-	encode_spat(de_spat, &encoded_spat2);
+	ssize_t buffer_size = determine_encoding_size(&asn_DEF_SPAT, de_spat);
+	encoded_spat2.buffer = calloc(1, buffer_size);
+	encode_spat(de_spat, &encoded_spat2, buffer_size);
 	SPAT_t *de_spat2 = (SPAT_t*)calloc(1, sizeof(SPAT_t));
 	decode_spat(&encoded_spat2, de_spat2);
+	free(encoded_spat2.buffer);
+	// show again
 	xml_print_spat(de_spat2);
 }

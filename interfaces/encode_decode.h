@@ -12,7 +12,7 @@ typedef struct encoded_spat{
  * note that the pre-allocated buffer must large enough.
  * return 0 for success, -1 fail
  */
-int encode_spat(SPAT_t *spat, EncodedSPAT_t *encoded_spat);
+int encode_spat(SPAT_t *spat, EncodedSPAT_t *encoded_spat, size_t buffer_size);
 
 /* encode spat to EncodedSPAT_t(struct) which allocate himself.
  */
@@ -31,5 +31,15 @@ int encode_rsm();
 int encode_rsm_to_new_buffer();
 int decode_rsm();
 int and_others();
+/***************************************
+ *    internal and useful function     *
+ ***************************************/
+/* function to determine the size of the structure's encoding before actually doing the encoding
+ */
+ssize_t determine_encoding_size(struct asn_TYPE_descriptor_s *type_descriptor, 
+								void *struct_ptr/* Structure to be encoded */);
+/* function used to determine the size of the structure's encoding before actually doing the encoding
+ */
+static int pass_write_out_f(const void *buffer, size_t size, void *key);
 
 #endif
