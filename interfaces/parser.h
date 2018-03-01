@@ -1,5 +1,5 @@
-#ifndef _PARSER_
-#define _PARSER_
+#ifndef _PARSER_H_
+#define _PARSER_H_
 
 #include <LightState.h>
 

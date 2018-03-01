@@ -1,5 +1,5 @@
-#ifndef _ENCODE_DECODE_
-#define _ENCODE_DECODE_
+#ifndef _ENCODE_DECODE_H_
+#define _ENCODE_DECODE_H_
 
 #include <SPAT.h>
 

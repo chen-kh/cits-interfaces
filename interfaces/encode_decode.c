@@ -1,5 +1,6 @@
 #include "encode_decode.h"
 #include "for_debug.h"
+#include <constr_TYPE.h>
 
 /* 
  */
@@ -39,16 +40,19 @@ int decode_spat(EncodedSPAT_t *encoded_spat, void *spat){
   	const asn_dec_rval_t rval = ber_decode(&cc, &asn_DEF_SPAT, &spat, encoded_spat->buffer, encoded_spat->no_bytes_encoded);
 	if (rval.code != RC_OK) {
     	CITS_DEBUG("ber_decode FAILED, broken encoding at byte %ld", rval.consumed);
+    	// ASN_STRUCT_FREE(asn_DEF_SPAT, spat);
     	return -1;
   	} else {
     	CITS_DEBUG("Decode SPAT SUCCESS!");
   		return 0;
   	}
 }
+
 ssize_t determine_encoding_size(struct asn_TYPE_descriptor_s *type_descriptor, void *struct_ptr/* Structure to be encoded */){
 	asn_enc_rval_t arv = der_encode(type_descriptor, struct_ptr, pass_write_out_f, stdout);
 	return arv.encoded;
 }
+
 /* function used to dertermin the size of the structure's encodeing before actually doing the encoding*/
 static int pass_write_out_f(const void *buffer, size_t size, void *key) {
 	return 0;

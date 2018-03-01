@@ -1,12 +1,16 @@
-#ifndef _CREATOR_
-#define _CREATOR_
+#ifndef _CREATOR_H_
+#define _CREATOR_H_
 
 /* This header file for creat all specified/needed dataType from char array.
  * SPAT, BSM, RSM, MAP, ...
  */
 #include <SPAT.h>
+#include <constr_TYPE.h>
 #include "parser.h"
 
+#define	STRUCT_FREE(asn_DEF, ptr)	(asn_DEF).free_struct(&(asn_DEF),ptr,0)
+#define	STRUCT_FREE_CONTENTS_ONLY(asn_DEF, ptr)	\
+					(asn_DEF).free_struct(&(asn_DEF),ptr,1)
 /* create instance of SPAT structure pre-allocated
  * return 0 for well done, -1 otherwise
  */

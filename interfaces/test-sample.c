@@ -13,22 +13,21 @@ int main(){
 	void* bytes;
 	size_t no_bytes = 45;
 	const int len = 8;
-	
+	bytes = calloc(no_bytes, 1);
 	do{
-		bytes = calloc(no_bytes, 1);
 		recv_socket(bytes, no_bytes);
 		DataType type = determine_dataType(bytes);
 
 		switch(type){
 			case T_SPAT:
 				test_spat(bytes, no_bytes, len);
-				free(bytes);
-				bytes=NULL;
+				// free(bytes);
+				// bytes=NULL;
 				break;
 			default:
 				return -1;
 		}
-	}while(1);
+	}while(0);
 	
 	return 0;
 }
@@ -71,4 +70,9 @@ void test_spat(void* bytes, size_t no_bytes, const int len){
 	free(encoded_spat2.buffer);
 	// show again
 	xml_print_spat(de_spat2);
+	
+	// free spat allocated
+	STRUCT_FREE(asn_DEF_SPAT, spat);
+	STRUCT_FREE(asn_DEF_SPAT, de_spat);
+	STRUCT_FREE(asn_DEF_SPAT, de_spat2);
 }
