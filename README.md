@@ -13,10 +13,9 @@
 - [接口本地测试文件](#接口本地测试文件)
     - [测试文件功能逻辑](#测试文件功能逻辑)
     - [测试文件运行](#测试文件运行)
-- [遗留的工作与问题](#遗留的工作与问题)
-    - [Todo Work](#todo-work)
-    - [遗留问题](#遗留问题)
 - [关于asn.1与asn1c](#关于asn1与asn1c)
+    - [asn.1和asn1c是什么？](#asn1和asn1c是什么)
+    - [asn1c使用小提示](#asn1c使用小提示)
 
 <!-- /TOC -->
 
@@ -76,35 +75,58 @@
 
 为了更好的查看debug信息，需要在编译测试时，添加`-DEMIT_CITS_DEBUG`, 也可以在Makefile.am.test文件中添加一行`CFLAGS += -DEMIT_CITS_DEBUG`。for_debug.h中定义了CITS_DEBUG函数专门用于输出debug信息。详见[for_debug.h](interfaces/for_debug.h)。
 
-## 遗留的工作与问题
-### Todo Work
-原设计数据类型中包含BSM, RSM, RSI, SPAT, MAP五大类。由于目前没有掌握除SPAT外的其他四类消息的内容，目前只完成SPAT一部分。其余部分的接口需要按照设计进行补充。
-### 遗留问题
-- 如何标示不同的数据类型 ？
-- der/ber 编码解码函数参数的问题？  
-asn1c 源码：
-```c
-/*
- * The DER encoder of any type. May be invoked by the application.
- * The ber_decode() function (ber_decoder.h) is an opposite of der_encode().
- */
-asn_enc_rval_t der_encode(struct asn_TYPE_descriptor_s *type_descriptor,
-		void *struct_ptr,	/* Structure to be encoded */
-		asn_app_consume_bytes_f *consume_bytes_cb,
-		void *app_key		/* Arbitrary callback argument */
-	);
-
-/* A variant of der_encode() which encodes data into the pre-allocated buffer */
-asn_enc_rval_t der_encode_to_buffer(
-		struct asn_TYPE_descriptor_s *type_descriptor,
-		void *struct_ptr,	/* Structure to be encoded */
-		void *buffer,		/* Pre-allocated buffer */
-		size_t buffer_size	/* Initial buffer size (maximum) */
-	);
-```
-第一个函数需要定制回调函数，converter-sample.c文件汇总定制为将编码结果输出到控制台（当然也可以是文件）。针对应用场景，编码后的结果需要发送，因此第二个函数更适合。但是第二个函数调用时两个关键参数`*buffer`和`buffer_size`的注释不是很清楚，buffer需要预先申请多大的空间以及buffer_size需要设置为多大不可预知。因为SPAT编码后的数据长度肯定是变的，因此两个参数设置为固定值不是很好（一定会出问题）。buffer_size不够的话，编码直接错误；buffer申请的内存不够的话可以正常编码，但是编码内容有丢失，在解码时会出错。  
-需要更细致的调查这两个参数如何设置。
-- another problem
 ## 关于asn.1与asn1c
-待补充
+### asn.1和asn1c是什么？
+维基百科中对asn.1的描述为：
+
+> 在电信和计算机网络领域，ASN.1（Abstract Syntax Notation One) 是一套标准，是描述数据的表示、编码、传输、解码的灵活的记法。它提供了一套正式、无歧义和精确的规则以描述独立于特定计算机硬件的对象结构。  
+
+asn.1是一套标准，这套标准规定了如何表示数据，如何编解码数据等等。使用这套标准可以较轻松地创建出符合标准的数据格式，其中使用到的语法是`asn language`，编解码规则有`ber,der,per,xer`等。简单Rectangle示例如下。更更多基本介绍见[维基百科关于asn.1的介绍](https://zh.wikipedia.org/wiki/ASN.1)
+
+```asn.1
+FooProtocol DEFINITIONS ::= BEGIN
+
+    FooQuestion ::= SEQUENCE {
+        trackingNumber INTEGER,
+        question       IA5String
+    }
+
+    FooAnswer ::= SEQUENCE {
+        questionNumber INTEGER,
+        answer         BOOLEAN
+    }
+
+END
+```
+
+实际定义数据格式的文件是.asn文件，也就是后缀是asn。在项目开发时，需要根据项目所需语言，将.asn文件编译成可供使用的文件，其中**asn1c**就是将asn文件编译得到.c和.h的标准C语言格式文件。asn1c全称`Open Source ASN.1 Compiler`，[官网戳这里](http://lionet.info/asn1c/compiler.html)。其中的Documentation和Examples都有阅读的必要。
+
+asn1c在ubuntu 14.04中的下载，以及编译命令：
+```shell
+# install asn1c
+sudo apt-get update
+sudo apt-get install asn1c
+# compile asn files
+asn1c *.asn
+# asn usage parameters
+man asn1c
+```
+
+### asn1c使用小提示
+- c文件与h文件  
+asn1c得到的.c和.h文件，类似于接口文件。数据类型和方法的定义都在.h文件中，代码的注释需要仔细阅读，由于没有标准的代码注释文档，使用时需要多参考代码的注释。比如什么方法是用户可能调用的，什么方法是内部使用的，一个新的数据结构如何构建，如何检查数据的规范性等等。
+
+- converter_sample.c文件  
+该文件是一个编码格式转换功能文件，使用Makefile.am.sample进行编译（查看文件内容，编译需要设置-DPDU参数）得到progname程序，可以从文件中读取某种编码格式数据，然后转换成指定编码格式数据。阅读该文件可以基本**掌握各种编码格式的使用方法**，非常有用。
+
+- 关于der编解码的长度问题  
+ber是常用的编码规则，在使用时，有两种方式：1. 仿照converter_sample.c文件中的定制回调函数形式，将编码后的结果写入文件（or stdout） 2. 使用der\_encode\_to\_buffer方法，将编码结果写入缓存区。第二种方法在使用过程中的主要难点是**确定编码后二进制数据的长度问题**。下面引用[asn-usgae](https://lionet.info/asn1c/asn1c-usage.html#SECTION02212000000000000000)说明解决办法。
+    > As you see, the DER encoder does not write into some sort of buffer or something. It just invokes the custom function (possible, multiple times) which would save the data into appropriate storage. The optional argument app_key is opaque for the DER encoder code and just used by _write_stream() as the pointer to the appropriate output stream to be used.
+    If the custom write function is not given (passed as 0), then the DER encoder will essentially do the same thing (i.e., encode the data) but no callbacks will be invoked (so the data goes nowhere). It may prove useful to determine the size of the structure's encoding before actually doing the encoding2.2.
+
+    方法描述为：为了确定编码后的长度，可以先进行一次预编码工作，这次编码工作中，回调函数不进行数据的写入，只记录编码后的长度。
+
+
+
+
 
