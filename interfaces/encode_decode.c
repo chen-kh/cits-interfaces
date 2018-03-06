@@ -17,7 +17,6 @@ int encode_spat(SPAT_t *spat, EncodedSPAT_t *encoded_spat, size_t buffer_size){
 }
 
 int encode_spat_to_new_buffer(SPAT_t *spat, EncodedSPAT_t *encoded_spat){
-	size_t init_buffer_size = sizeof(SPAT_t);
 	ssize_t size_encoding = determine_encoding_size(&asn_DEF_SPAT, spat);
 	encoded_spat->buffer = calloc(1, size_encoding);
 	size_t buffer_size = size_encoding; // ???
