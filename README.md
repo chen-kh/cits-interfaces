@@ -1,5 +1,5 @@
 # 接口文档简略说明
-**注意**：完整项目已经移至act实验室gitlab上，网址：http://gitlab.act.buaa.edu.cn/TCSAE/libcits。该仓库只完成了部分工作。
+**注意**：完整项目已经移至act实验室gitlab上，网址：http://gitlab.act.buaa.edu.cn/TCSAE/libcits， 该仓库只完成了部分工作。
 
 <!-- TOC -->
 
