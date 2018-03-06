@@ -1,4 +1,5 @@
-# 接口文档说明
+# 接口文档简略说明
+**注意**：完整项目已经移至act实验室gitlab上，网址：http://gitlab.act.buaa.edu.cn/TCSAE/libcits。该仓库只完成了部分工作。
 
 <!-- TOC -->
 
@@ -122,7 +123,7 @@ asn1c得到的.c和.h文件，类似于接口文件。数据类型和方法的�
 - 关于der编解码的长度问题  
 ber是常用的编码规则，在使用时，有两种方式：1. 仿照converter_sample.c文件中的定制回调函数形式，将编码后的结果写入文件（or stdout） 2. 使用der\_encode\_to\_buffer方法，将编码结果写入缓存区。第二种方法在使用过程中的主要难点是**确定编码后二进制数据的长度问题**。下面引用[asn-usgae](https://lionet.info/asn1c/asn1c-usage.html#SECTION02212000000000000000)说明解决办法。
     > As you see, the DER encoder does not write into some sort of buffer or something. It just invokes the custom function (possible, multiple times) which would save the data into appropriate storage. The optional argument app_key is opaque for the DER encoder code and just used by _write_stream() as the pointer to the appropriate output stream to be used.
-    If the custom write function is not given (passed as 0), then the DER encoder will essentially do the same thing (i.e., encode the data) but no callbacks will be invoked (so the data goes nowhere). It may prove useful to determine the size of the structure's encoding before actually doing the encoding2.2.
+    If the custom write function is not given (passed as 0), then the DER encoder will essentially do the same thing (i.e., encode the data) but no callbacks will be invoked (so the data goes nowhere). ***It may prove useful to determine the size of the structure's encoding before actually doing the encoding2.2.***
 
     方法描述为：为了确定编码后的长度，可以先进行一次预编码工作，这次编码工作中，回调函数不进行数据的写入，只记录编码后的长度。
 
