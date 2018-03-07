@@ -15,9 +15,7 @@ int create_spat_from_PhaList(Pha_t *phaList, const int len, SPAT_t *spat){
 		PhaseID pid = pha.id;
 		Light lid = pha.light;
 		long likelyEndTime = pha.likelyEndTime;
-
 		Phase_t *phase = (Phase_t*)calloc(1, sizeof(Phase_t));
-		
 		PhaseState_t *phaseState = (PhaseState_t*)calloc(1,sizeof(PhaseState_t));		
 		asn_long2INTEGER(&phaseState->light, lid); // set light id (dark, red, green, yellow)
 
@@ -26,16 +24,13 @@ int create_spat_from_PhaList(Pha_t *phaList, const int len, SPAT_t *spat){
 		 */
 		timing->startTime = 0;// default value
 		timing->likelyEndTime = likelyEndTime; // set likelyEndTime
-		
 		phaseState->timing = timing;
-		
 		ret = ASN_SEQUENCE_ADD(&phase->phaseStates, phaseState);
 		CITS_DEBUG("%s add to %s %s!", var2str(phaseState), var2str(phase->phaseStates), ret == 0 ? "SUCCESS" : "FAIL");
 		if(ret != 0){
 			return -1;
 		}
 		phase->id = pid; // set phase id
-
 		ret = ASN_SEQUENCE_ADD(&state->phases, phase);
 		CITS_DEBUG("%s add to %s %s!", var2str(phase), var2str(state->phases), ret == 0 ? "SUCCESS" : "FAIL");
 		if(ret != 0){

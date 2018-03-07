@@ -1,5 +1,9 @@
 # ignore vscode
 .vscode/*
+
+# ignore ctags files
+.tags*
+
 # Prerequisites
 *.d
 
